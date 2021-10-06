@@ -1,0 +1,77 @@
+static void main(Args _args)
+
+{
+    str caller;
+    FormRun callerForm;
+    Dialog dialog = new Dialog();
+    DialogField dialogField;
+    AsciiIo importFile;
+    str filePath,fileNameOnly;
+    filetype type;
+    container record;
+    str Delimiter = ",";
+    int totalRecords;
+    Ordini Ordini;
+
+    Orders=_args.record();
+    callerForm=_args.caller();
+    caller=callerForm.name();
+
+    dialogField=dialog.addField(extendedTypeStr(FilenameOpen),"Select File","Select file to import");
+    dialog.caption("Select File to import/update");
+    dialog.filenameLookupFilter(['csv','*.csv']);
+    dialog.run();
+    
+
+   
+    [filePath, fileNameOnly, type] = fileNameSplit(dialogField.value());
+    importFile = new AsciiIo(dialogField.value(), 'R');
+
+    if((!importFile) || (importFile.status() != IO_Status::Ok))
+    {
+            warning("Error in opening import file");
+            throw(Exception::Error);
+    }
+
+    importFile.inFieldDelimiter(Delimiter);
+
+    if((!importFile) || (importFile.status() != IO_Status::Ok))
+    {
+            warning("Error in opening log file");
+            throw(Exception::Error);
+    }
+
+    try
+    {
+
+         ttsbegin;
+        //record = importFile.read();
+            while(importFile.status() == IO_Status::Ok)
+            {
+                record = importFile.read();
+                if(!record)
+                break;
+                totalRecords = totalRecords + 1;
+    
+                Orders.OrdId=conPeek(record,1);
+                Orders.AutoID= conPeek(record,2);
+                Orders.ClientID=conPeek(record,3);
+                Orders.DateOrder=str2Date(conPeek(record,4),123);
+                Orders.Notes=conPeek(record,5);
+                Orders.insert();
+                Orders.reread();
+
+            }
+
+            ttscommit;
+    }
+
+    catch(Exception::Error)
+
+    {
+            Throw(Exception::Error);
+    }
+
+    info(strFmt("Total Read Records = %1",totalRecords));
+    callerForm.dataSource().refresh();
+}
