@@ -1,0 +1,13 @@
+void clicked()
+{
+    Args           args;
+    FormRun        formRun;
+
+    args           = new Args();
+    args.record(Orders);
+    args.name(formstr(AddOrders));
+    formRun        = ClassFactory.formRunClass(args);
+    formRun.init();
+    formRun.run();
+    formRun.wait();
+}
