@@ -1,0 +1,5 @@
+public class FormRun extends ObjectRun
+{
+    RecId recId;
+    FormRun callerForm;
+}
