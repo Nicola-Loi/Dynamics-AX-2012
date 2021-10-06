@@ -1,0 +1,8 @@
+public void init()
+{
+    str caller;
+    super();
+    callerForm = element.args().caller();
+    caller=callerForm.name();
+    RecId = element.args().record().RecId;
+}
