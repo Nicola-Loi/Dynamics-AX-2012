@@ -1,0 +1,5 @@
+public void executeQuery()
+{
+    this.query().dataSourceTable(tablenum(Orders)).addRange(fieldnum(Orders, RecId)).value(queryValue(RecId));
+    super();
+}
