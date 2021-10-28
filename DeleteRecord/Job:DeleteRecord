@@ -1,0 +1,63 @@
+static void DeleteRecordWithImport(Args _args)
+{
+    RecId recId;
+    TableName tableName;
+    DictTable dt;               //initiate the class, the objective is use the DIctable
+    Common tablecommon;          //he system table Common is the base for all tables
+
+    Dialog dialog = new Dialog();
+    DialogField dialogField;
+    AsciiIo importFile;
+    str filePath,fileNameOnly;
+    filetype type;
+    container record;
+    str recordOrdID;
+    str Delimiter = ",";
+    int totalRecords;
+
+
+    dialogField=dialog.addField(extendedTypeStr(FilenameOpen),"Select File","Select file to import");
+    dialog.caption("Select File to import/update");
+    dialog.filenameLookupFilter(['csv','*.csv']);
+    dialog.run();
+
+    [filePath, fileNameOnly, type] = fileNameSplit(dialogField.value());
+    importFile = new AsciiIo(dialogField.value(), 'R');
+    importFile.inFieldDelimiter(Delimiter);
+
+    ttsBegin;
+
+    while(importFile.status() == IO_Status::Ok)
+    {
+
+
+            record = importFile.read(); // pick the first element of the CSV
+            if(!record)
+            break;
+            totalRecords = totalRecords + 1;
+
+            recId = conPeek(record,1);
+            tableName = conPeek(record,2);
+
+            dt = new DictTable(tableName2Id(tableName));
+
+            if(dt)
+            {
+                tablecommon = dt.makeRecord();
+                select tablecommon where tablecommon.RecId == recId;
+            }
+        /*
+            if(tablecommon)
+            {
+                delete_from tablecommon where tablecommon.RecId == recId;
+            }
+        */
+
+
+    }
+
+    ttsCommit;
+
+
+
+}
