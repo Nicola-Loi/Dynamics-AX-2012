@@ -1,0 +1,51 @@
+void clicked()
+{
+
+    #AOT
+    DictTable dt;
+    DictTable dictTable;
+    Common tablecommon, tableCommonBackup;
+    TreeNode treeNode;
+
+    treeNode = TreeNode::findNode(
+        #TablesPath
+        +"\\" + StringEdit.valueStr()
+        +"_Backup");
+
+
+    dt = new DictTable(tableName2id(StringEdit.valueStr()));
+    tablecommon = dt.makeRecord();
+
+    while select tablecommon where tablecommon.RecId == str2int64(StringEdit1.valueStr())
+    {
+
+        if(treeNode == null)
+        {
+            info("The backup table doesn't exist");
+            treeNode = TreeNode::findNode(#TablesPath+"\\"+ StringEdit.valueStr());
+            //treeNode.AOTadd(StringEdit.valueStr()+"_Backup");
+            treeNode.AOTDuplicate();
+            treeNode = TreeNode::findNode(#TablesPath+"\\"+ "CopyOf"+ StringEdit.valueStr());
+            treeNode.AOTRename(StringEdit.valueStr()+"_Backup");
+            SqlDataDictionary::synchronize();
+
+            dictTable = new SysDictTable(tableName2id(StringEdit.valueStr()+"_Backup"));
+            tableCommonBackup = dictTable.makeRecord();
+
+            Global::buf2BufName(tablecommon, tableCommonBackup);
+            tableCommonBackup.insert();
+
+        }
+        else
+        {
+            info("The backup table exist yet");
+            dictTable = new SysDictTable(tableName2id(StringEdit.valueStr()+"_Backup"));
+            tableCommonBackup = dictTable.makeRecord();
+
+            Global::buf2BufName(tablecommon, tableCommonBackup);
+            tableCommonBackup.insert();
+        }
+    }
+    super();
+
+}
